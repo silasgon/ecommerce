@@ -62,7 +62,7 @@ $app->get("/admin/users", function (){
 
     User::verifyLogin();
 
-    User::listAll();
+    $users = User::listAll();
 
     $page = new PageAdmin();
 
