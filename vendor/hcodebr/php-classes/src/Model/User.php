@@ -130,7 +130,41 @@ class User extends Model{
         $sql->query("CALL sp_users_delete(:iduser)", array(
             ":iduser"=>$this->getiduser()
         ));
+    }
 
+    public static function getForgot($email){
+
+        $sql = new Sql();
+
+        $results = $sql->select("SELECT * FROM tb_persons a INNER JOIN tb_users b USING (idperson) WHERE a.desemail = :email;",
+            array(
+                ":email"=>$email
+        ));
+
+        if (count($results) === 0){
+
+            throw new \Exception("Não foi possível recuperar a senha.");
+
+        }else{
+
+            $data = $results[0];
+
+            $sql->select("CALL sp_userspasswordsrecoveries_create(:iduser, :desip)",
+                array(
+                    ":iduser"=>$data["iduser"],
+                    ":desip"=>$_SERVER["REMOTE_ADDR"]
+            ));
+
+            if (count($results2) === 0){
+
+                throw new \Exception("Não foi possível recuperar a senha.");
+
+            }else{
+                $dataRecovery = $results2[0];
+
+
+            }
+        }
     }
 
 }
