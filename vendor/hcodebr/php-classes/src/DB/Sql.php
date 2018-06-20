@@ -19,7 +19,6 @@ class Sql {
 			Sql::USERNAME,
 			Sql::PASSWORD
 		);
-
 	}
 
 	private function setParams($statement, $parameters = array())
@@ -30,7 +29,6 @@ class Sql {
 			$this->bindParam($statement, $key, $value);
 
 		}
-
 	}
 
 	private function bindParam($statement, $key, $value)

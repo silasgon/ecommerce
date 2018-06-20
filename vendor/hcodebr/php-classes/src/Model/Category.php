@@ -19,7 +19,7 @@ class Category extends Model{
 
         $sql = new Sql();
 
-       return $sql->select("SELECT * FROM tb_categories ORDER BY descategory");
+        return $sql->select("SELECT * FROM tb_categories ORDER BY descategory");
     }
 
     public function save(){
@@ -80,14 +80,14 @@ class Category extends Model{
 
         if ($related === true){
 
-           return $sql->select("SELECT * FROM tb_products WHERE idproduct IN(
+            return $sql->select("SELECT * FROM tb_products WHERE idproduct IN(
                                       SELECT a.idproduct 
                                       FROM tb_products a 
                                       INNER JOIN tb_categoriesproducts b ON a.idproduct = b.idproduct
                                       WHERE b.idcategory = :idcategory
                                     );
                                   ", [
-                                      ':idcategory'=>$this->getidcategory()
+                ':idcategory'=>$this->getidcategory()
             ]);
 
         }else{
@@ -99,9 +99,37 @@ class Category extends Model{
                                       WHERE b.idcategory = :idcategory
                                     );
                                  ", [
-                                     ':idcategory'=>$this->getidcategory()
-                     ]);
+                ':idcategory'=>$this->getidcategory()
+            ]);
         }
+    }
+
+    public function getProductsPage($page = 1, $itemsPerPage = 3){
+
+        $start = ($page - 1) * $itemsPerPage;
+
+        $sql = new Sql();
+
+        $results = $sql->select("
+            SELECT SQL_CALC_FOUND_ROWS * 
+                FROM tb_products a 
+                INNER JOIN tb_categoriesproducts b ON a.idproduct = b.idproduct
+                INNER JOIN tb_categories c ON c.idcategory = b.idcategory
+                where c.idcategory = :idcategory
+                Limit $start, $itemsPerPage;
+        ", [
+            ':idcategory'=>$this->getidcategory()
+        ]);
+
+
+        $resultTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+        return[
+            'data'=>Product::checkList($results),
+            'total'=>(int)$resultTotal[0]["nrtotal"],
+            'pages'=>ceil($resultTotal[0]["nrtotal"] / $itemsPerPage)
+        ];
+
     }
 
     public function addProduct(Product $product){
@@ -109,8 +137,8 @@ class Category extends Model{
         $sql = new Sql();
 
         $sql->query("INSERT INTO tb_categoriesproducts (idcategory, idproduct) VALUES (:idcategory, :idproduct)", [
-                                ':idcategory'=>$this->getidcategory(),
-                                ':idproduct'=>$product->getidproduct()
+            ':idcategory'=>$this->getidcategory(),
+            ':idproduct'=>$product->getidproduct()
         ]);
 
     }
