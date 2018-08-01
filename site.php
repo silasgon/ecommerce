@@ -74,8 +74,8 @@ $app->get("/cart", function (){
 
     $page = new Page();
 
-    var_dump($cart->getValues());
-    exit;
+    //var_dump($cart->getValues());
+    //exit;
 
     $page->setTpl("cart", [
         'cart'=>$cart->getValues(),
